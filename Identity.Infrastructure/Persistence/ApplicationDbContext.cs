@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OpenIddict.EntityFrameworkCore.Models;
+﻿using Identity.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.EntityFrameworkCore;
+using System.Data;
 
 public class ApplicationDbContext : DbContext
 {
@@ -12,4 +14,8 @@ public class ApplicationDbContext : DbContext
 
         builder.UseOpenIddict();
     }
+
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Permission> Permissions => Set<Permission>();
 }

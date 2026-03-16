@@ -1,0 +1,29 @@
+﻿using Identity.Domain.Entities;
+
+namespace Identity.Api.Services
+{
+    public class AuthService
+    {
+        private readonly ApplicationDbContext _db;
+        private readonly PasswordHasher _hasher;
+
+        public AuthService(ApplicationDbContext db, PasswordHasher hasher)
+        {
+            _db = db;
+            _hasher = hasher;
+        }
+
+        public async Task<User?> ValidateUser(string email, string password)
+        {
+            var user = _db.Users.FirstOrDefault(x => x.Email == email);
+
+            if (user == null)
+                return null;
+
+            if (!_hasher.Verify(password, user.PasswordHash))
+                return null;
+
+            return user;
+        }
+    }
+}
