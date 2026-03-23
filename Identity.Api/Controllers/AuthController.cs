@@ -33,7 +33,9 @@ public class AuthController : Controller
             );
 
             if (user == null)
+            {
                 return Forbid();
+            }
 
             var identity = new ClaimsIdentity(
                 OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
