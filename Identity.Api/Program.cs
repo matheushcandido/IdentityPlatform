@@ -28,6 +28,9 @@ builder.Services.AddOpenIddict()
 
         options.AllowPasswordFlow();
         options.AllowRefreshTokenFlow();
+        options.SetRefreshTokenReuseLeeway(TimeSpan.Zero);
+        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(15));
+        options.SetRefreshTokenLifetime(TimeSpan.FromDays(30));
         options.AllowAuthorizationCodeFlow();
 
         options.RegisterScopes(

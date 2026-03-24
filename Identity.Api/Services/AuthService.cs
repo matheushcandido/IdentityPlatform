@@ -1,4 +1,5 @@
 ﻿using Identity.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
 {
@@ -24,6 +25,12 @@ namespace Identity.Api.Services
                 return null;
 
             return user;
+        }
+
+        public async Task<User?> GetUserByIdAsync(Guid id)
+        {
+            return await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == id && u.IsActive);
         }
     }
 }
