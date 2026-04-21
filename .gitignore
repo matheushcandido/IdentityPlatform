@@ -1,19 +1,42 @@
-# Visual Studio
+# Visual Studio / IDE
 .vs/
+.vscode/
+.idea/
 
-# Build folders
-bin/
-obj/
-
-# User files
+# User-specific files
 *.user
+*.rsuser
 *.suo
 *.userosscache
 *.sln.docstates
 
-# Logs
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+TestResults/
+
+# Logs and diagnostics
 *.log
+*.trx
+build.log
+
+# Local .NET CLI/cache artifacts
+.dotnet/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.template
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
 
 # OS files
 .DS_Store
 Thumbs.db
+Desktop.ini

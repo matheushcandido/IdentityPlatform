@@ -1,4 +1,6 @@
+using Identity.Api.Authentication;
 using Identity.Api.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
@@ -26,12 +28,13 @@ builder.Services.AddOpenIddict()
         options.SetAuthorizationEndpointUris("/connect/authorize");
         options.SetEndSessionEndpointUris("/connect/logout");
 
-        options.AllowPasswordFlow();
-        options.AllowRefreshTokenFlow();
-        options.SetRefreshTokenReuseLeeway(TimeSpan.Zero);
+        options.AllowAuthorizationCodeFlow()
+               .AllowRefreshTokenFlow()
+               .RequireProofKeyForCodeExchange();
+
+        options.SetAuthorizationCodeLifetime(TimeSpan.FromMinutes(5));
         options.SetAccessTokenLifetime(TimeSpan.FromMinutes(15));
         options.SetRefreshTokenLifetime(TimeSpan.FromDays(30));
-        options.AllowAuthorizationCodeFlow();
 
         options.RegisterScopes(
             "api",
@@ -44,6 +47,7 @@ builder.Services.AddOpenIddict()
         options.AddDevelopmentSigningCertificate();
 
         options.UseAspNetCore()
+               .EnableEndSessionEndpointPassthrough()
                .EnableTokenEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
     })
@@ -53,12 +57,26 @@ builder.Services.AddOpenIddict()
         options.UseLocalServer();
         options.UseAspNetCore();
         options.AddAudiences("resource_server");
+        options.EnableAuthorizationEntryValidation();
+        options.EnableTokenEntryValidation();
     });
 
 builder.Services.AddAuthentication(options =>
 {
+    options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
     options.DefaultForbidScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+})
+.AddCookie(AuthenticationSchemes.InteractiveCookie, options =>
+{
+    options.Cookie.Name = "identityplatform.interactive";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/account/login";
 });
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();

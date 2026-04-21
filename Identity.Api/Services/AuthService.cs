@@ -16,7 +16,7 @@ namespace Identity.Api.Services
 
         public async Task<User?> ValidateUser(string email, string password)
         {
-            var user = _db.Users.FirstOrDefault(x => x.Email == email);
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
                 return null;
