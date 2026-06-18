@@ -1,4 +1,5 @@
-﻿using Identity.Domain.Entities;
+using Identity.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
 {
@@ -13,18 +14,32 @@ namespace Identity.Api.Services
             _hasher = hasher;
         }
 
-        public async Task CreateUser(string email, string password)
+        public async Task<User?> CreateUser(string email, string password)
         {
+            var normalizedEmail = NormalizeEmail(email);
+            var emailAlreadyExists = await _db.Users.AnyAsync(user => user.Email == normalizedEmail);
+            if (emailAlreadyExists)
+            {
+                return null;
+            }
+
             var user = new User
             {
                 Id = Guid.NewGuid(),
-                Email = email,
+                Email = normalizedEmail,
                 PasswordHash = _hasher.Hash(password),
                 IsActive = true
             };
 
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
+
+            return user;
+        }
+
+        private static string NormalizeEmail(string email)
+        {
+            return email.Trim().ToLowerInvariant();
         }
     }
 }

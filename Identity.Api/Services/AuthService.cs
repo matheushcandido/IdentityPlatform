@@ -1,4 +1,4 @@
-﻿using Identity.Domain.Entities;
+using Identity.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
@@ -16,7 +16,8 @@ namespace Identity.Api.Services
 
         public async Task<User?> ValidateUser(string email, string password)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == normalizedEmail);
 
             if (user == null)
                 return null;

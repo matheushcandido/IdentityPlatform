@@ -1,4 +1,5 @@
-﻿using Identity.Api.Services;
+using Identity.Api.Models;
+using Identity.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,11 +17,15 @@ namespace Identity.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string email, string password)
+        public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
         {
-            await _userService.CreateUser(email, password);
+            var user = await _userService.CreateUser(request.Email, request.Password);
+            if (user == null)
+            {
+                return Conflict(new { message = "A user with this email already exists." });
+            }
 
-            return Ok();
+            return Created($"/api/users/{user.Id}", new { user.Id, user.Email, user.IsActive });
         }
     }
 }
