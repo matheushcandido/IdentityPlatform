@@ -95,6 +95,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     await OpenIddictSeeder.SeedAsync(scope.ServiceProvider);
+    await BootstrapAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
 }
 
 app.Run();

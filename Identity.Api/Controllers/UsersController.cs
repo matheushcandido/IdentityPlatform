@@ -17,6 +17,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
         {
             var user = await _userService.CreateUser(request.Email, request.Password);
