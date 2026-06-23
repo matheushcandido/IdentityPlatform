@@ -78,7 +78,11 @@ builder.Services.AddAuthentication(options =>
     options.SlidingExpiration = true;
     options.LoginPath = "/account/login";
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Users.Create", policy =>
+        policy.RequireClaim("permission", "Users.Create"));
+});
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<UserService>();
@@ -94,6 +98,9 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+
     await OpenIddictSeeder.SeedAsync(scope.ServiceProvider);
     await BootstrapAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
 }

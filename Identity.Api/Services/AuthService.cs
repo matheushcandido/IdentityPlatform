@@ -31,6 +31,10 @@ namespace Identity.Api.Services
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
             return await _db.Users
+                .Include(user => user.UserRoles)
+                    .ThenInclude(userRole => userRole.Role)
+                        .ThenInclude(role => role.RolePermissions)
+                            .ThenInclude(rolePermission => rolePermission.Permission)
                 .FirstOrDefaultAsync(u => u.Id == id && u.IsActive);
         }
     }

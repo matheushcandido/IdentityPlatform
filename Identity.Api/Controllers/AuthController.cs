@@ -14,6 +14,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 [AllowAnonymous]
 public class AuthController : Controller
 {
+    private const string PermissionClaimType = "permission";
     private readonly AuthService _authService;
 
     public AuthController(AuthService authService)
@@ -167,6 +168,20 @@ public class AuthController : Controller
 
         identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
         identity.AddClaim(new Claim(Claims.Email, user.Email));
+        foreach (var role in user.UserRoles.Select(userRole => userRole.Role.Name).Distinct())
+        {
+            identity.AddClaim(new Claim(Claims.Role, role));
+        }
+
+        var permissions = user.UserRoles
+            .SelectMany(userRole => userRole.Role.RolePermissions)
+            .Select(rolePermission => rolePermission.Permission.Name)
+            .Distinct();
+
+        foreach (var permission in permissions)
+        {
+            identity.AddClaim(new Claim(PermissionClaimType, permission));
+        }
 
         var principal = new ClaimsPrincipal(identity);
         principal.SetScopes(scopes);
@@ -178,6 +193,10 @@ public class AuthController : Controller
                 Destinations.AccessToken
             ],
             Claims.Subject =>
+            [
+                Destinations.AccessToken
+            ],
+            Claims.Role or PermissionClaimType =>
             [
                 Destinations.AccessToken
             ],
