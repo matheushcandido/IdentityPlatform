@@ -6,7 +6,13 @@ namespace Identity.Api.Services
     public static class BootstrapAdminSeeder
     {
         private const string AdminRoleName = "Admin";
-        private const string UsersCreatePermissionName = "Users.Create";
+        private static readonly string[] AdminPermissionNames =
+        [
+            "Users.Create",
+            "Users.Read",
+            "Users.Update",
+            "Users.Disable"
+        ];
 
         public static async Task SeedAsync(IServiceProvider services, IConfiguration configuration)
         {
@@ -48,18 +54,24 @@ namespace Identity.Api.Services
                 db.Roles.Add(adminRole);
             }
 
-            var usersCreatePermission = await db.Permissions
-                .FirstOrDefaultAsync(permission => permission.Name == UsersCreatePermissionName);
-
-            if (usersCreatePermission == null)
+            var permissions = new List<Permission>();
+            foreach (var permissionName in AdminPermissionNames)
             {
-                usersCreatePermission = new Permission
-                {
-                    Id = Guid.NewGuid(),
-                    Name = UsersCreatePermissionName
-                };
+                var permission = await db.Permissions
+                    .FirstOrDefaultAsync(existingPermission => existingPermission.Name == permissionName);
 
-                db.Permissions.Add(usersCreatePermission);
+                if (permission == null)
+                {
+                    permission = new Permission
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = permissionName
+                    };
+
+                    db.Permissions.Add(permission);
+                }
+
+                permissions.Add(permission);
             }
 
             await db.SaveChangesAsync();
@@ -76,17 +88,20 @@ namespace Identity.Api.Services
                 });
             }
 
-            var roleHasPermission = await db.RolePermissions.AnyAsync(rolePermission =>
-                rolePermission.RoleId == adminRole.Id &&
-                rolePermission.PermissionId == usersCreatePermission.Id);
-
-            if (!roleHasPermission)
+            foreach (var permission in permissions)
             {
-                db.RolePermissions.Add(new RolePermission
+                var roleHasPermission = await db.RolePermissions.AnyAsync(rolePermission =>
+                    rolePermission.RoleId == adminRole.Id &&
+                    rolePermission.PermissionId == permission.Id);
+
+                if (!roleHasPermission)
                 {
-                    RoleId = adminRole.Id,
-                    PermissionId = usersCreatePermission.Id
-                });
+                    db.RolePermissions.Add(new RolePermission
+                    {
+                        RoleId = adminRole.Id,
+                        PermissionId = permission.Id
+                    });
+                }
             }
 
             await db.SaveChangesAsync();

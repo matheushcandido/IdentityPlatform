@@ -82,6 +82,15 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Users.Create", policy =>
         policy.RequireClaim("permission", "Users.Create"));
+
+    options.AddPolicy("Users.Read", policy =>
+        policy.RequireClaim("permission", "Users.Read"));
+
+    options.AddPolicy("Users.Update", policy =>
+        policy.RequireClaim("permission", "Users.Update"));
+
+    options.AddPolicy("Users.Disable", policy =>
+        policy.RequireClaim("permission", "Users.Disable"));
 });
 builder.Services.AddControllers();
 
