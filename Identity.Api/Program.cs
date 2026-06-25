@@ -95,6 +95,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PasswordHasher>();
 
