@@ -1,4 +1,5 @@
 using Identity.Domain.Entities;
+using Identity.Domain.Models.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
@@ -6,13 +7,6 @@ namespace Identity.Api.Services
     public static class BootstrapAdminSeeder
     {
         private const string AdminRoleName = "Admin";
-        private static readonly string[] AdminPermissionNames =
-        [
-            "Users.Create",
-            "Users.Read",
-            "Users.Update",
-            "Users.Disable"
-        ];
 
         public static async Task SeedAsync(IServiceProvider services, IConfiguration configuration)
         {
@@ -55,17 +49,19 @@ namespace Identity.Api.Services
             }
 
             var permissions = new List<Permission>();
-            foreach (var permissionName in AdminPermissionNames)
+            foreach (var permissionDefinition in SystemPermissions.All)
             {
                 var permission = await db.Permissions
-                    .FirstOrDefaultAsync(existingPermission => existingPermission.Name == permissionName);
+                    .FirstOrDefaultAsync(existingPermission =>
+                        existingPermission.Name == permissionDefinition.Key);
 
                 if (permission == null)
                 {
                     permission = new Permission
                     {
                         Id = Guid.NewGuid(),
-                        Name = permissionName
+                        Name = permissionDefinition.Key,
+                        Description = permissionDefinition.Value
                     };
 
                     db.Permissions.Add(permission);

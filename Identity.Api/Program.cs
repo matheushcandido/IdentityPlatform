@@ -2,6 +2,7 @@ using Identity.Api.Authentication;
 using Identity.Api.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 
@@ -91,6 +92,12 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("Users.Disable", policy =>
         policy.RequireClaim("permission", "Users.Disable"));
+
+    options.AddPolicy("Assignments.Grant", policy =>
+        policy.RequireClaim("permission", "Assignments.Grant"));
+
+    options.AddPolicy("Assignments.Revoke", policy =>
+        policy.RequireClaim("permission", "Assignments.Revoke"));
 });
 builder.Services.AddControllers();
 
@@ -98,9 +105,37 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AssignmentService>();
 builder.Services.AddScoped<PasswordHasher>();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Identity Platform API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insira o token JWT assim: Bearer {seu token}"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+});
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
