@@ -1,4 +1,5 @@
 using Identity.Domain.Entities;
+using Identity.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
@@ -27,7 +28,7 @@ namespace Identity.Api.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<Permission?> CreatePermissionAsync(string name, string description)
+        public async Task<Permission?> CreatePermissionAsync(string name, string description, PermissionType permissionType)
         {
             var exists = await _db.Permissions.AnyAsync(p => p.Name == name);
             if (exists) return null;
@@ -36,7 +37,8 @@ namespace Identity.Api.Services
             {
                 Id = Guid.NewGuid(),
                 Name = name,
-                Description = description
+                Description = description,
+                Type = permissionType
             };
 
             _db.Permissions.Add(permission);

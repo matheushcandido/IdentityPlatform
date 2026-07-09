@@ -147,8 +147,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
 
+    await PermissionSeeder.SeedAsync(app.Services);
+    await BootstrapAdminSeeder.SeedAsync(app.Services, app.Configuration);
     await OpenIddictSeeder.SeedAsync(scope.ServiceProvider);
-    await BootstrapAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
 }
 
 app.Run();

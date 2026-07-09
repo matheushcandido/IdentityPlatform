@@ -41,7 +41,7 @@ namespace Identity.Api.Controllers
         [Authorize(Policy = "Permissions.Create")]
         public async Task<IActionResult> Create([FromBody] CreatePermissionRequest request)
         {
-            var permission = await _permissionService.CreatePermissionAsync(request.Name, request.Description);
+            var permission = await _permissionService.CreatePermissionAsync(request.Name, request.Description, request.Type);
 
             if (permission is null)
                 return Conflict(new { message = "A permission with this name already exists." });

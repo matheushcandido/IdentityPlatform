@@ -6,7 +6,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Identity.Api.Controllers
 {
-    [ApiController]
+/*    [ApiController]
     [Authorize]
     [Route("api/me")]
     public sealed class MeController : ControllerBase
@@ -24,4 +24,5 @@ namespace Identity.Api.Controllers
             });
         }
     }
+*/
 }

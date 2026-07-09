@@ -1,4 +1,5 @@
 using Identity.Domain.Entities;
+using Identity.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
@@ -27,15 +28,15 @@ namespace Identity.Api.Services
                 .FirstOrDefaultAsync(role => role.Id == id);
         }
 
-        public async Task<Role> CreateRoleAsync(string name)
+        public async Task<Role> CreateRoleAsync(string name, string description, RoleType roleType)
         {
-            var role = new Role { Id = Guid.NewGuid(), Name = name };
+            var role = new Role { Id = Guid.NewGuid(), Name = name, Description = description, RoleType = roleType };
             _db.Roles.Add(role);
             await _db.SaveChangesAsync();
             return role;
         }
 
-        public async Task<Role?> UpdateRoleAsync(Guid id, string newName)
+        public async Task<Role?> UpdateRoleAsync(Guid id, string newName, string newDescription)
         {
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == id);
 
@@ -43,6 +44,7 @@ namespace Identity.Api.Services
                 return null;
 
             role.Name = newName;
+            role.Description = newDescription;
             await _db.SaveChangesAsync();
             return role;
         }

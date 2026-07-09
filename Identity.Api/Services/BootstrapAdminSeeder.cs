@@ -1,5 +1,4 @@
 using Identity.Domain.Entities;
-using Identity.Domain.Models.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.Services
@@ -22,7 +21,10 @@ namespace Identity.Api.Services
             }
 
             var normalizedEmail = email.Trim().ToLowerInvariant();
-            var admin = await db.Users.FirstOrDefaultAsync(user => user.Email == normalizedEmail);
+
+            var admin = await db.Users
+                .FirstOrDefaultAsync(user => user.Email == normalizedEmail);
+
             if (admin == null)
             {
                 admin = new User
@@ -36,7 +38,9 @@ namespace Identity.Api.Services
                 db.Users.Add(admin);
             }
 
-            var adminRole = await db.Roles.FirstOrDefaultAsync(role => role.Name == AdminRoleName);
+            var adminRole = await db.Roles
+                .FirstOrDefaultAsync(role => role.Name == AdminRoleName);
+
             if (adminRole == null)
             {
                 adminRole = new Role
@@ -48,32 +52,13 @@ namespace Identity.Api.Services
                 db.Roles.Add(adminRole);
             }
 
-            var permissions = new List<Permission>();
-            foreach (var permissionDefinition in SystemPermissions.All)
-            {
-                var permission = await db.Permissions
-                    .FirstOrDefaultAsync(existingPermission =>
-                        existingPermission.Name == permissionDefinition.Key);
-
-                if (permission == null)
-                {
-                    permission = new Permission
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = permissionDefinition.Key,
-                        Description = permissionDefinition.Value
-                    };
-
-                    db.Permissions.Add(permission);
-                }
-
-                permissions.Add(permission);
-            }
-
             await db.SaveChangesAsync();
 
+            var permissions = await db.Permissions.ToListAsync();
+
             var adminHasRole = await db.UserRoles.AnyAsync(userRole =>
-                userRole.UserId == admin.Id && userRole.RoleId == adminRole.Id);
+                userRole.UserId == admin.Id &&
+                userRole.RoleId == adminRole.Id);
 
             if (!adminHasRole)
             {

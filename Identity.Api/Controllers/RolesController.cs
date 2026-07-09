@@ -37,14 +37,14 @@ namespace Identity.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
         {
-            var role = await _roleService.CreateRoleAsync(request.Name);
+            var role = await _roleService.CreateRoleAsync(request.Name, request.Description, request.Type);
             return CreatedAtAction(nameof(GetById), new { id = role.Id }, role);
         }
 
         [HttpPatch("{id:guid}")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] UpdateRoleRequest request)
         {
-            var role = await _roleService.UpdateRoleAsync(id, request.Name);
+            var role = await _roleService.UpdateRoleAsync(id, request.Name, request.Description);
 
             if (role is null)
                 return NotFound();
