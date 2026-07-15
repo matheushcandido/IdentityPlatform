@@ -1,4 +1,3 @@
-using Identity.Api.Models;
 using Identity.Domain.Enums;
 
 namespace Identity.Domain.Entities;

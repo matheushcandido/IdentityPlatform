@@ -30,7 +30,7 @@ namespace Identity.Api.Services
 
         public async Task<Role> CreateRoleAsync(string name, string description, RoleType roleType)
         {
-            var role = new Role { Id = Guid.NewGuid(), Name = name, Description = description, RoleType = roleType };
+            var role = new Role { Id = Guid.NewGuid(), Name = name, Description = description, Type = roleType };
             _db.Roles.Add(role);
             await _db.SaveChangesAsync();
             return role;

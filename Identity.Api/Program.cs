@@ -1,5 +1,6 @@
 using Identity.Api.Authentication;
 using Identity.Api.Services;
+using Identity.Domain.Models.Constants;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -81,23 +82,13 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Users.Create", policy =>
-        policy.RequireClaim("permission", "Users.Create"));
-
-    options.AddPolicy("Users.Read", policy =>
-        policy.RequireClaim("permission", "Users.Read"));
-
-    options.AddPolicy("Users.Update", policy =>
-        policy.RequireClaim("permission", "Users.Update"));
-
-    options.AddPolicy("Users.Disable", policy =>
-        policy.RequireClaim("permission", "Users.Disable"));
-
-    options.AddPolicy("Assignments.Grant", policy =>
-        policy.RequireClaim("permission", "Assignments.Grant"));
-
-    options.AddPolicy("Assignments.Revoke", policy =>
-        policy.RequireClaim("permission", "Assignments.Revoke"));
+    foreach (var permissionDefinition in SystemPermissions.All)
+    {
+        options.AddPolicy(permissionDefinition.Key, policy =>
+        {
+            policy.RequireClaim("permission", permissionDefinition.Key);
+        });
+    }
 });
 builder.Services.AddControllers();
 
@@ -147,8 +138,8 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
 
-    await PermissionSeeder.SeedAsync(app.Services);
-    await BootstrapAdminSeeder.SeedAsync(app.Services, app.Configuration);
+    await PermissionSeeder.SeedAsync(scope.ServiceProvider);
+    await BootstrapAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
     await OpenIddictSeeder.SeedAsync(scope.ServiceProvider);
 }
 
