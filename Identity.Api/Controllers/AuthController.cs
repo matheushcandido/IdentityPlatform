@@ -190,15 +190,18 @@ public class AuthController : Controller
         {
             Claims.Email when claim.Subject.HasScope(Scopes.Email) =>
             [
-                Destinations.AccessToken
+                Destinations.AccessToken,
+        Destinations.IdentityToken
             ],
             Claims.Subject =>
             [
-                Destinations.AccessToken
+                Destinations.AccessToken,
+        Destinations.IdentityToken
             ],
             Claims.Role or PermissionClaimType =>
             [
-                Destinations.AccessToken
+                Destinations.AccessToken,
+        Destinations.IdentityToken
             ],
             _ => []
         });
