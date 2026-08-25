@@ -79,6 +79,15 @@ builder.Services.AddAuthentication(options =>
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;
     options.LoginPath = "/account/login";
+})
+.AddCookie(AuthenticationSchemes.MfaPendingCookie, options =>
+{
+    options.Cookie.Name = "identityplatform.mfa-pending";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.SlidingExpiration = false;
 });
 builder.Services.AddAuthorization(options =>
 {
@@ -109,6 +118,7 @@ builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<AssignmentService>();
 builder.Services.AddScoped<PasswordHasher>();
+builder.Services.AddSingleton<TotpService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

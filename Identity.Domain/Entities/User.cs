@@ -10,5 +10,10 @@ public class User
 
     public bool IsActive { get; set; }
 
+    // Protected with ASP.NET Core Data Protection before being persisted.
+    public string? TotpSecret { get; set; }
+
+    public bool IsTotpEnabled { get; set; }
+
     public ICollection<UserRole> UserRoles { get; set; } = [];
 }
