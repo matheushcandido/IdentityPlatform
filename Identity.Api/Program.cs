@@ -3,6 +3,7 @@ using Identity.Api.Services;
 using Identity.Domain.Models.Constants;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.OpenApi;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
 
     options.UseOpenIddict();
+
+    options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 });
 
 builder.Services.AddOpenIddict()
@@ -75,7 +78,7 @@ builder.Services.AddAuthentication(options =>
     options.Cookie.Name = "identityplatform.interactive";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;
     options.LoginPath = "/account/login";
@@ -85,7 +88,7 @@ builder.Services.AddAuthentication(options =>
     options.Cookie.Name = "identityplatform.mfa-pending";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
     options.SlidingExpiration = false;
 });

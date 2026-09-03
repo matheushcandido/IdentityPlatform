@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Identity.Api.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("api/assignments")]
     public sealed class AssignmentsController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpPost("users/{userId:guid}/roles/{roleId:guid}")]
-        //[Authorize(Policy = "Assignments.Grant")]
+        [Authorize(Policy = "Assignments.Grant")]
         public async Task<IActionResult> AssignRoleToUser(Guid userId, Guid roleId)
         {
             var result = await _assignmentService.AssignRoleToUserAsync(userId, roleId);
@@ -31,7 +31,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpDelete("users/{userId:guid}/roles/{roleId:guid}")]
-        //[Authorize(Policy = "Assignments.Revoke")]
+        [Authorize(Policy = "Assignments.Revoke")]
         public async Task<IActionResult> RemoveRoleFromUser(Guid userId, Guid roleId)
         {
             var result = await _assignmentService.RemoveRoleFromUserAsync(userId, roleId);
@@ -44,7 +44,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpPost("roles/{roleId:guid}/permissions/{permissionId:guid}")]
-        //[Authorize(Policy = "Assignments.Grant")]
+        [Authorize(Policy = "Assignments.Grant")]
         public async Task<IActionResult> AssignPermissionToRole(Guid roleId, Guid permissionId)
         {
             var result = await _assignmentService.AssignPermissionToRoleAsync(roleId, permissionId);
@@ -58,7 +58,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpDelete("roles/{roleId:guid}/permissions/{permissionId:guid}")]
-        //[Authorize(Policy = "Assignments.Revoke")]
+        [Authorize(Policy = "Assignments.Revoke")]
         public async Task<IActionResult> RemovePermissionFromRole(Guid roleId, Guid permissionId)
         {
             var result = await _assignmentService.RemovePermissionFromRoleAsync(roleId, permissionId);

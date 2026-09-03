@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Identity.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/roles")]
     public sealed class RolesController : ControllerBase
     {
@@ -17,6 +18,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Roles.Read")]
         public async Task<IActionResult> GetAll()
         {
             var roles = await _roleService.GetRolesAsync();
@@ -24,6 +26,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize(Policy = "Roles.Read")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var role = await _roleService.GetRoleByIdAsync(id);
@@ -35,6 +38,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "Roles.Create")]
         public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
         {
             var role = await _roleService.CreateRoleAsync(request.Name, request.Description, request.Type);
@@ -42,6 +46,7 @@ namespace Identity.Api.Controllers
         }
 
         [HttpPatch("{id:guid}")]
+        [Authorize(Policy = "Roles.Update")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] UpdateRoleRequest request)
         {
             var role = await _roleService.UpdateRoleAsync(id, request.Name, request.Description);
