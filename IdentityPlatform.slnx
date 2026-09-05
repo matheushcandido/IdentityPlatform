@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="Identity.Api/Identity.Api.csproj" />
+  <Project Path="Identity.Connectors/Identity.Connectors.csproj" />
   <Project Path="Identity.Domain/Identity.Domain.csproj" />
   <Project Path="Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  <Project Path="Identity.SyncWorker/Identity.SyncWorker.csproj" />
 </Solution>
